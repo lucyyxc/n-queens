@@ -57,7 +57,6 @@ window.countNRooksSolutions = function(n) {
       }
     }
   }
-  console.log(solution.rows());
   resultsArr.push(JSON.stringify(solution.rows()));
   if (!solution.hasAnyRooksConflicts() && counter === n) {
     solutionCount++;
@@ -76,7 +75,6 @@ window.countNRooksSolutions = function(n) {
       }
     }
   }
-  console.log(solution.rows());
   if (!solution.hasAnyRooksConflicts() && !resultsArr.includes(JSON.stringify(solution.rows())) && counter === n) {
     solutionCount++;
     resultsArr.push(JSON.stringify(solution.rows()));
@@ -100,13 +98,81 @@ window.countNRooksSolutions = function(n) {
       }
     }
   }
-  console.log('JSON', resultsArr.indexOf(JSON.stringify(solution.rows())));
-  console.log(solution.rows());
-  console.log('counter', counter);
-  console.log('WHY IS THIS HAPPENING', resultsArr.indexOf(JSON.stringify(solution.rows()) === -1)); // logs -1 and does not log false
   if (!solution.hasAnyRooksConflicts() && counter === n && !resultsArr.includes(JSON.stringify(solution.rows()))) {
     solutionCount++;
     resultsArr.push(JSON.stringify(solution.rows()));
+  }
+
+  solution = new Board({'n': n});
+  matrix = solution.rows();
+  counter = 0;
+  solution.togglePiece(0, 1);
+  counter++;
+  for (var i = 0; i < matrix.length; i++) {
+    for (var j = matrix[i].length - 1; j >= 0; j--) {
+      if (i === 0 && j === 1) {
+        continue;
+      }
+      solution.togglePiece(i, j);
+      counter++;
+      if (solution.hasAnyRooksConflicts()) {
+        solution.togglePiece(i, j);
+        counter--;
+      }
+    }
+  }
+  if (!solution.hasAnyRooksConflicts() && counter === n && !resultsArr.includes(JSON.stringify(solution.rows()))) {
+    solutionCount++;
+    resultsArr.push(JSON.stringify(solution.rows()));
+  }
+
+  solution = new Board({'n': n});
+  matrix = solution.rows();
+  counter = 0;
+  solution.togglePiece(0, 0);
+  counter++;
+  for (var i = 0; i < matrix.length; i++) {
+    for (var j = matrix[i].length - 1; j >= 0; j--) {
+      if (i === 0 && j === 0) {
+        continue;
+      }
+      solution.togglePiece(i, j);
+      counter++;
+      if (solution.hasAnyRooksConflicts()) {
+        solution.togglePiece(i, j);
+        counter--;
+      }
+    }
+  }
+  if (!solution.hasAnyRooksConflicts() && counter === n && !resultsArr.includes(JSON.stringify(solution.rows()))) {
+    solutionCount++;
+    resultsArr.push(JSON.stringify(solution.rows()));
+  }
+
+  solution = new Board({'n': n});
+  matrix = solution.rows();
+  counter = 0;
+  if (solution._isInBounds(0, 2)) {
+    solution.togglePiece(0, 2);
+    counter++;
+
+    for (var i = 0; i < matrix.length; i++) {
+      for (var j = 0; j < matrix[i].length; j++) {
+        if (i === 0 && j === 2) {
+          continue;
+        }
+        solution.togglePiece(i, j);
+        counter++;
+        if (solution.hasAnyRooksConflicts()) {
+          solution.togglePiece(i, j);
+          counter--;
+        }
+      }
+    }
+    if (!solution.hasAnyRooksConflicts() && counter === n && !resultsArr.includes(JSON.stringify(solution.rows()))) {
+      solutionCount++;
+      resultsArr.push(JSON.stringify(solution.rows()));
+    }
   }
 
   console.log('Number of solutions for ' + n + ' rooks:', solutionCount);
@@ -115,8 +181,24 @@ window.countNRooksSolutions = function(n) {
 
 // return a matrix (an array of arrays) representing a single nxn chessboard, with n queens placed such that none of them can attack each other
 window.findNQueensSolution = function(n) {
-  var solution = undefined; //fixme
+  if (n === 2 || n === 3) {
+    return 0;
+  }
+  if (n === 0 || n === 1) {
+    return 1;
+  }
+  var solution = new Board({'n': n});
+  var matrix = solution.rows();
+  solution.togglePiece(0, 1);
 
+  for (var i = 0; i < matrix.length; i++) {
+    for (var j = 0; j < matrix[i].length; j++) {
+      solution.togglePiece(i, j);
+      if (solution.hasAnyQueensConflicts()) {
+        solution.togglePiece(i, j);
+      }
+    }
+  }
   console.log('Single solution for ' + n + ' queens:', JSON.stringify(solution));
   return solution;
 };
