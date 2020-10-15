@@ -18,22 +18,96 @@
 window.findNRooksSolution = function(n) {
   var solution = new Board({'n': n});
   //choose starting position to place rook
-  console.log(solution.set(2));
-
-  console.log('SOLUTION', solution);
+  // solution.togglePiece(0, 0);
   //iterate over each row and column
+  var matrix = solution.rows();
+  for (var i = 0; i < matrix.length; i++) {
+    for (var j = 0; j < matrix[i].length; j++) {
+      solution.togglePiece(i, j);
+      if (solution.hasAnyRooksConflicts()) {
+        solution.togglePiece(i, j);
+      }
+    }
+  }
+
   //if the row and column helper functions both return false
   //use solution.set(row)(column) to set the value there at 1
-
-
-
-  console.log('Single solution for ' + n + ' rooks:', JSON.stringify(solution));
-  return solution;
+  console.log('Single solution for ' + n + ' rooks:', JSON.stringify(solution.rows()));
+  return solution.rows();
 };
 
 // return the number of nxn chessboards that exist, with n rooks placed such that none of them can attack each other
 window.countNRooksSolutions = function(n) {
-  var solutionCount = undefined; //fixme
+  if (n === 0 || n === 1) {
+    return 1;
+  }
+  var solutionCount = 0;
+  var resultsArr = [];
+  var solution = new Board({'n': n});
+  var matrix = solution.rows();
+  var counter = 0;
+
+  for (var i = 0; i < matrix.length; i++) {
+    for (var j = 0; j < matrix[i].length; j++) {
+      solution.togglePiece(i, j);
+      counter++;
+      if (solution.hasAnyRooksConflicts()) {
+        solution.togglePiece(i, j);
+        counter--;
+      }
+    }
+  }
+  console.log(solution.rows());
+  resultsArr.push(JSON.stringify(solution.rows()));
+  if (!solution.hasAnyRooksConflicts() && counter === n) {
+    solutionCount++;
+  }
+
+  solution = new Board({'n': n});
+  matrix = solution.rows();
+  counter = 0;
+  for (var i = 0; i < matrix.length; i++) {
+    for (var j = matrix[i].length - 1; j >= 0; j--) {
+      solution.togglePiece(i, j);
+      counter++;
+      if (solution.hasAnyRooksConflicts()) {
+        solution.togglePiece(i, j);
+        counter--;
+      }
+    }
+  }
+  console.log(solution.rows());
+  if (!solution.hasAnyRooksConflicts() && !resultsArr.includes(JSON.stringify(solution.rows())) && counter === n) {
+    solutionCount++;
+    resultsArr.push(JSON.stringify(solution.rows()));
+  }
+
+  solution = new Board({'n': n});
+  matrix = solution.rows();
+  counter = 0;
+  solution.togglePiece(0, 1);
+  counter++;
+  for (var i = 0; i < matrix.length; i++) {
+    for (var j = 0; j < matrix[i].length; j++) {
+      if (i === 0 && j === 1) {
+        continue;
+      }
+      solution.togglePiece(i, j);
+      counter++;
+      if (solution.hasAnyRooksConflicts()) {
+        solution.togglePiece(i, j);
+        counter--;
+      }
+    }
+  }
+  console.log('JSON', resultsArr.indexOf(JSON.stringify(solution.rows())));
+  console.log(solution.rows());
+  console.log('counter', counter);
+  console.log('WHY IS THIS HAPPENING', resultsArr.indexOf(JSON.stringify(solution.rows()) === -1)); // logs -1 and does not log false
+  if (!solution.hasAnyRooksConflicts() && counter === n && !resultsArr.includes(JSON.stringify(solution.rows()))) {
+    solutionCount++;
+    resultsArr.push(JSON.stringify(solution.rows()));
+  }
 
   console.log('Number of solutions for ' + n + ' rooks:', solutionCount);
   return solutionCount;
